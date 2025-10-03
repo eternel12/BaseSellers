@@ -1,0 +1,59 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract VendeuseManagement {
+
+    // Structure représentant une vente de baguettes
+    struct Sale {
+        uint256 baguettesSold; // Nombre de baguettes vendues lors de la vente
+        uint256 day; // Le jour ou l'enregistrement de la vente
+    }
+
+    // Liste des ventes de baguettes
+    Sale[] public sales;
+
+    // Charge de travail d'une vendeuse (nombre de baguettes qu'elle peut gérer par jour)
+    uint256 public baguettesPerVendeuse;
+
+    // Constructeur pour initialiser le nombre de baguettes qu'une vendeuse peut gérer par jour
+    constructor(uint256 _baguettesPerVendeuse) {
+        baguettesPerVendeuse = _baguettesPerVendeuse;
+    }
+
+    // Ajouter une vente de baguettes
+    function addSale(uint256 baguettesSold, uint256 day) public {
+        require(baguettesSold > 0, "Le nombre de bag\u00eates vendues doit \u00eatre positif");
+        
+        // Ajouter la vente à la liste des ventes
+        sales.push(Sale(baguettesSold, day));
+    }
+
+    // Calculer le nombre optimal de vendeuses nécessaires
+    function calculateOptimalVendeuses() public view returns (uint256) {
+        uint256 totalBaguettes = 0;
+
+        // Calculer le total des baguettes vendues
+        for (uint256 i = 0; i < sales.length; i++) {
+            totalBaguettes += sales[i].baguettesSold;
+        }
+
+        // Eviter la division par zéro si aucune vente n'a été ajoutée
+        require(totalBaguettes > 0, string("Aucune vente n'a ete ajoutee"));
+
+
+        // Calculer le nombre optimal de vendeuses nécessaires
+        uint256 optimalVendeuses = totalBaguettes / baguettesPerVendeuse;
+
+        // Si la division ne donne pas un entier exact, il faut ajouter une vendeuse supplémentaire
+        if (totalBaguettes % baguettesPerVendeuse > 0) {
+            optimalVendeuses += 1;
+        }
+
+        return optimalVendeuses;
+    }
+
+    // Voir le nombre total de ventes enregistrées
+    function getSalesCount() public view returns (uint256) {
+        return sales.length;
+    }
+}
